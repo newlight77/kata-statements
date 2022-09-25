@@ -1,0 +1,103 @@
+= Back-End Coding Exercise
+
+The exercise is to write a command line driven text search engine.
+
+From what I understand by reading the assignment, the core feature of the program is to :
+
+* Read all text files from a given directory,
+* Build an in-memory representation of the files and their contents
+* Then prompt interactively for words (keywords) to perform searches
+* And finally return a list of the top 10 (maximum) matching filenames in rank order, giving the rank score for each match.
+
+Duration : 2-3 hours
+
+[#ranking]
+== Ranking
+
+* The rank score must be 100% if a file contains all the words
+* It must be 0% if it contains none of the words
+* It should be between 0 and 100 if it contains only some of the words, but the exact ranking formula is up to you to choose and implement
+
+[#myassumptions]
+== My Assumptions
+
+* The program reads only files with ".txt" extension
+* The search key word must not have any special character, a space is allowed
+* A "word" is a sequence of one or more characters separated by a space, comma or dot or any special character e.g. -(*,.&!&)"""<>#?
+* When searching with one word, the equal (matching) implies the whole sequence of characters are matching, both parties are lowercase, the searching word could part fo the full word in the content.
+* When searching with several words, the equal (matching) implies the matching of every single word against each word within the content of the text file
+* The ranking formula is simple : number matched search words / total number of search words.
+* Later if time allows, use of statistics based on frequency of searched words
+
+[#myapproach]
+= My Approach
+
+For this exercise, I choose to go with ATDD & TDD to focus on the core value, which is the search engine, instead of spending time on the command line mechanism. ATDD for acceptance testing with a bit higher level to test the Search engine entry point, then TDD at lower level with unit testing.
+
+I would implement only three acceptance criteria because I don't believe I will be able to do more than that :
+
+* Searching a word in a .txt file that contains at least the search word
+----
+Given : a directory having only one text file named "simple-search-file-1.txt"
+And : the file "simple-search-file-1.txt" content is "Sunday Afternoon, kong is doing ATDD! And ?$#!Corona?$#! is out there :)"
+When : the user inputs a search keyword "kong"
+Then : the outcome displays one line with "simple-search-file-1.txt : 100%"
+----
+
+* Searching a word in a .txt file that does not contain the search word
+----
+Given : a directory having only one text file named "simple-search-file-1.txt"
+And : the file "simple-search-file-1.txt" content is "Sunday Afternoon, kong is doing ATDD! And ?$#!Corona?$#! is out there :)"
+When : the user inputs a search keyword "news"
+Then : the outcome displays one line with "simple-search-file-1.txt : 0%"
+----
+
+* Searching three words in a .txt file that contains two out of three words
+----
+Given : a directory having only one text file named "simple-search-file-1.txt"
+And : the file "simple-search-file-1.txt" content is "Sunday Afternoon, kong is doing ATDD! And ?$#!Corona?$#! is out there :)"
+When : the user inputs a search keyword "kong doing ATDD"
+Then : the outcome displays one line with "simple-search-file-1.txt : 100%"
+----
+
+* Searching three words in a .txt file that contains one out of three words
+----
+Given : a directory having only one text file named "simple-search-file-1.txt"
+And : the file "simple-search-file-1.txt" content is "Sunday Afternoon, kong is doing ATDD! And ?$#!Corona?$#! is out there :)"
+When : the user inputs a search keyword "kong coding java"
+Then : the outcome displays one line with "simple-search-file-1.txt : 33%"
+----
+
+* Searching four words that are found separately in multiple .txt files
+----
+Given : a directory having only text files named "simple-search-file-1.txt", named "simple-search-file-2.txt" and named "simple-search-file-3.txt"
+And : the file "simple-search-file-1.txt" content is "Sunday Afternoon, kong is doing ATDD!"
+And : the file "simple-search-file-2.txt" content is "And ?$#!Corona?$#! is out there :)"
+And : the file "simple-search-file-3.txt" content is "Now everyone panics! Meanwhile coders drinks corona ;)"
+When : the user inputs a search keyword "kong coding java"
+Then : the outcome displays multiple lines as : "simple-search-file-23txt : 50% simple-search-file-2.txt : 25% simple-search-file-3.txt : 0% "
+----
+
+I'll go for a basic Kotlin program using Gradle, Junit5 and AssertJ.
+
+Update : Finally, I've completed four acceptance tests. I'll stop here after around 3 hours of work.
+
+[#myconfiguration]
+= My Configuration
+
+* openjdk version "13.0.2" 2020-01-14
+* Gradle 6.2.2
+* Refer to build.gradle.kts for more details in dependencies
+
+[#runit]
+= Run it
+
+[source sh]
+----
+$ ./gradlew clean test
+
+$ ./gradlew run
+
+> Task :run
+
+----
